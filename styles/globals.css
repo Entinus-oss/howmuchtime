@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 65% 4%;
+    --foreground: 210 40% 98%;
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 220 65% 4%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 217 10% 65%;
+    --accent: 180 100% 50%;
+    --accent-foreground: 220 65% 4%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 180 100% 50%;
+    --chart-1: 180 100% 50%;
+    --chart-2: 270 75% 60%;
+    --chart-3: 310 75% 60%;
+    --chart-4: 45 100% 50%;
+    --chart-5: 120 75% 50%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .crypto-card {
+    @apply bg-card/50 backdrop-blur-sm border border-border/20 rounded-lg p-6;
+    @apply shadow-lg shadow-primary/10;
+  }
+  
+  .crypto-button {
+    @apply bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30;
+    @apply transition-all duration-300 ease-in-out;
+    @apply hover:shadow-lg hover:shadow-primary/20;
+  }
+  
+  .glow-text {
+    @apply text-primary;
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .neon-border {
+    @apply border-primary/50;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  }
+  
+  .grid-pattern {
+    background-image: 
+      linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  /* Custom scrollbar styles */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-border/40 rounded-full;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-border/60;
+  }
+  
+  .scrollbar-thumb-border::-webkit-scrollbar-thumb {
+    @apply bg-border/40 rounded-full;
+  }
+  
+  .scrollbar-thumb-border::-webkit-scrollbar-thumb:hover {
+    @apply bg-border/60;
+  }
+  
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  /* Firefox scrollbar styles */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border) / 0.4) transparent;
+  }
+  
+  /* Fun facts card animations */
+  .fun-fact-card {
+    animation: slideInUp 0.4s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Smooth hover effects for fun facts cards */
+  .fun-fact-card:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease-out;
+  }
+} 
