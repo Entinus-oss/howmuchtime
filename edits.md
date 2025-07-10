@@ -2107,3 +2107,62 @@ Every single interactive element in the application now has snappy, responsive h
 - `components/SteamOAuthButton.tsx` - Fixed Steam OAuth button
 
 All Framer Motion button animations are now perfectly synchronized with the CSS transitions for a seamless user experience.
+
+### Git Push - Site Version Update
+**Date:** $(date)
+**Commit:** 68ccaf2
+
+Successfully pushed the new site version to GitHub with the following changes:
+- 19 files changed (1,253 insertions, 96 deletions)
+- New authentication components: AuthenticationModal, SteamIcon, SteamOAuthButton
+- New authentication API endpoints: /api/auth/session, /api/auth/steam/login, /api/auth/steam/callback
+- Updated multiple existing components and styles
+- Improved Steam integration features
+
+**Command:** `git push origin main`
+**Result:** Successfully pushed to main branch on GitHub
+
+## 2024-12-28 - Fixed Steam Authentication Domain Redirect Issue
+
+**Problem Fixed:**
+- Steam authentication was hardcoded to redirect to localhost instead of using the current domain
+- When deployed to production (e.g., `https://howmuchtime-wccw.vercel.app/`), Steam OAuth would redirect back to `http://localhost:3000`
+- This caused authentication failures in production environments
+
+**Solution Implemented:**
+- Made the Steam authentication redirect URL dynamic based on the current request domain
+- Automatically detects the protocol (http/https) and host from request headers
+- Works seamlessly across all environments (localhost, staging, production, custom domains)
+
+**Technical Changes:**
+- **Dynamic URL Construction**: Replaced hardcoded `process.env.NEXTAUTH_URL || 'http://localhost:3000'` with dynamic URL detection
+- **Protocol Detection**: Uses `x-forwarded-proto` header or connection encryption to determine http/https
+- **Host Detection**: Uses `x-forwarded-host` or `host` header to get the current domain
+- **Universal Compatibility**: Works with any domain without code changes
+
+**Code Changes:**
+```typescript
+// Before (hardcoded):
+const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+
+// After (dynamic):
+const protocol = req.headers['x-forwarded-proto'] || (req.connection as any)?.encrypted ? 'https' : 'http'
+const host = req.headers['x-forwarded-host'] || req.headers.host
+const baseUrl = `${protocol}://${host}`
+```
+
+**Files Modified:**
+- `pages/api/auth/steam/login.ts`: Updated to use dynamic URL construction
+
+**Benefits:**
+- **Environment Agnostic**: Works in development, staging, and production without configuration
+- **Domain Flexible**: Supports any domain name without code changes
+- **Automatic Detection**: No need to manually update URLs when changing domains
+- **Reliable Authentication**: Steam OAuth now works correctly in all environments
+
+**User Experience:**
+- **Seamless Login**: Steam authentication now works properly on the live site
+- **No Redirects to Localhost**: Users stay on the correct domain throughout the auth flow
+- **Consistent Experience**: Same authentication flow works across all environments
+
+This fix ensures that Steam authentication works correctly regardless of the domain being used, eliminating the need for manual URL updates when deploying to different environments.

@@ -6,7 +6,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    // Dynamically determine the base URL from the request
+    const protocol = req.headers['x-forwarded-proto'] || (req.connection as any)?.encrypted ? 'https' : 'http'
+    const host = req.headers['x-forwarded-host'] || req.headers.host
+    const baseUrl = `${protocol}://${host}`
+    
     const returnUrl = `${baseUrl}/api/auth/steam/callback`
     
     // Steam OpenID 2.0 parameters
