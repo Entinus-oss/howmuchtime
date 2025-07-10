@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
+import Script from 'next/script'
 import '../styles/globals.css'
 import { ThemeProvider } from '@/components/InteractiveTitle'
 
@@ -14,6 +15,15 @@ export default function App({ Component, pageProps }: AppProps) {
           rel="stylesheet"
         />
       </Head>
+      
+      {/* Google AdSense Script */}
+      <Script 
+        async 
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1472717657817413"
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
+      
       <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: 'Inter, sans-serif' }}>
       <div className="relative min-h-screen">
         {/* Background Grid Pattern */}

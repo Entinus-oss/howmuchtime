@@ -14,6 +14,7 @@ import { GameAnalytics } from '@/components/GameAnalytics'
 import { FunFacts } from '@/components/FunFacts'
 import { InteractiveTitle } from '@/components/InteractiveTitle'
 import { AuthenticationModal, useAuthentication } from '@/components/AuthenticationModal'
+import { ResponsiveAdBanner } from '@/components/AdBanner'
 
 import { useHiddenGames, calculateVisibleStats } from '@/lib/gameUtils'
 import { recentAccountsStorage } from '@/lib/recentAccounts'
@@ -478,6 +479,18 @@ export default function Home() {
             />
           )}
 
+          {/* Ad Banner - After Profile */}
+          {steamData && currentView === 'profile' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mb-12 flex justify-center"
+            >
+              <ResponsiveAdBanner position="after-profile" className="mx-auto" />
+            </motion.div>
+          )}
+
           {/* Friends List View */}
           {currentView === 'friends' && (
             <FriendsList
@@ -565,6 +578,18 @@ export default function Home() {
             </motion.div>
           )}
 
+          {/* Ad Banner - After Stats Overview */}
+          {steamData && currentView === 'profile' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="mb-12 flex justify-center"
+            >
+              <ResponsiveAdBanner position="after-stats" className="mx-auto" />
+            </motion.div>
+          )}
+
           {/* Top Games */}
           {steamData && allTopGames.length > 0 && (
             <motion.div
@@ -587,6 +612,18 @@ export default function Home() {
                   />
                 ))}
               </div>
+            </motion.div>
+          )}
+
+          {/* Ad Banner - After Top Games */}
+          {steamData && currentView === 'profile' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="mb-12 flex justify-center"
+            >
+              <ResponsiveAdBanner position="after-top-games" className="mx-auto" />
             </motion.div>
           )}
 
@@ -613,6 +650,18 @@ export default function Home() {
                   />
                 ))}
               </div>
+            </motion.div>
+          )}
+
+          {/* Ad Banner - After Recent Activity */}
+          {steamData && currentView === 'profile' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
+              className="mb-12 flex justify-center"
+            >
+              <ResponsiveAdBanner position="after-recent-activity" className="mx-auto" />
             </motion.div>
           )}
 
