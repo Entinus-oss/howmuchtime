@@ -185,7 +185,7 @@ function FriendCard({ friend, index, onSelect }: FriendCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
-      className="bg-card/30 border border-border/20 rounded-lg p-4 hover:bg-card/50 hover:border-primary/30 transition-all duration-200 cursor-pointer group"
+      className="bg-card/30 border border-border/20 rounded-lg p-4 hover:bg-card/50 hover:border-primary/30 transition-all duration-150 cursor-pointer group"
       onClick={() => {
         // Track this as a visited account
         recentAccountsStorage.addVisitedAccount({

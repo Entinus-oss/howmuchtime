@@ -52,20 +52,10 @@ export function GameCard({ game, rank, formatPlaytime, showRecentPlaytime, isHid
         opacity: { duration: 0.3, delay: rank * 0.1 },
         y: { duration: 0.3, delay: rank * 0.1 }
       }}
-      whileHover={{ 
-        scale: 1.05, 
-        y: -5,
-        transition: { duration: 0.2, ease: "easeOut" }
-      }}
+      whileHover={{ scale: 1.05 }}
       whileTap={onShowAnalytics ? { scale: 0.95 } : undefined}
       className={`crypto-card group relative overflow-hidden ${onShowAnalytics ? 'cursor-pointer' : ''}`}
       onClick={handleCardClick}
-      style={{
-        willChange: 'transform',
-        backfaceVisibility: 'hidden',
-        transform: 'translateZ(0)',
-        contain: 'layout style paint'
-      }}
     >
       {/* Rank Badge */}
       <div className="absolute top-4 left-4 z-10">
@@ -81,11 +71,11 @@ export function GameCard({ game, rank, formatPlaytime, showRecentPlaytime, isHid
           onClick={handleToggleClick}
           title={isHidden ? "Click to show in stats" : "Click to hide from stats"}
         >
-          <div className={`p-2 rounded-full transition-all duration-200 hover:scale-110 ${
-            isHidden 
-              ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
-              : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-          } backdrop-blur-sm border border-border/20`}>
+                  <div className={`p-2 rounded-full transition-all duration-150 hover:scale-110 ${
+          isHidden 
+            ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
+            : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+        } backdrop-blur-sm border border-border/20`}>
             {isHidden ? (
               <EyeOff className="w-4 h-4" />
             ) : (
@@ -106,11 +96,6 @@ export function GameCard({ game, rank, formatPlaytime, showRecentPlaytime, isHid
             className="object-cover"
             priority={rank <= 5}
             loading={rank <= 5 ? "eager" : "lazy"}
-            style={{
-              willChange: 'transform',
-              backfaceVisibility: 'hidden',
-              transform: 'translateZ(0)'
-            }}
             onError={(e) => {
               const target = e.target as HTMLImageElement
               target.src = `data:image/svg+xml;base64,${btoa('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" fill="#1a1a1a"/><rect x="8" y="8" width="48" height="48" fill="#333" rx="8"/><circle cx="32" cy="24" r="6" fill="#00ffff"/><rect x="20" y="36" width="24" height="4" fill="#00ffff" rx="2"/><rect x="24" y="44" width="16" height="4" fill="#666" rx="2"/></svg>')}`
@@ -118,7 +103,7 @@ export function GameCard({ game, rank, formatPlaytime, showRecentPlaytime, isHid
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-lg text-foreground truncate group-hover:text-primary transition-colors duration-200">
+          <h3 className="font-bold text-lg text-foreground truncate group-hover:text-primary transition-colors">
             {game.name}
           </h3>
           <div className="flex items-center space-x-2 text-muted-foreground text-sm">
@@ -137,10 +122,10 @@ export function GameCard({ game, rank, formatPlaytime, showRecentPlaytime, isHid
       )}
 
       {/* Hover Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none" />
       
       {/* Border Animation */}
-      <div className="absolute inset-0 border border-primary/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+      <div className="absolute inset-0 border border-primary/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none" />
     </motion.div>
   )
 } 

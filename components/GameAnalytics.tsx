@@ -368,7 +368,7 @@ export function GameAnalytics({ steamId, gameIds, onClose }: GameAnalyticsProps)
                                {gameAchievements.totalAchievements > 0 && (
                                  <div className="w-full bg-muted rounded-full h-2">
                                    <div 
-                                     className="bg-primary h-2 rounded-full transition-all duration-300"
+                                     className="bg-primary h-2 rounded-full transition-all duration-150"
                                      style={{ width: `${gameAchievements.isPrivateProfile || isPrivateProfile ? 0 : gameAchievements.completionPercentage}%` }}
                                    />
                                  </div>

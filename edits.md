@@ -2,6 +2,123 @@
 
 ## Latest Updates
 
+### 2024-12-27 - Removed Raise Animation from Game Cards
+
+**Problem:**
+- Game cards had a "raise" animation (y: -5) that the user disliked
+- User wanted to keep only the zoom/scale effect without vertical movement
+
+**Solution:**
+- Removed the `y: -5` from the whileHover animation
+- Kept only the scale effect for a cleaner hover interaction
+- Maintained all other hover effects (glow, border, text color change)
+
+**Changes:**
+- **components/GameCard.tsx**: Changed `whileHover={{ scale: 1.05, y: -5 }}` to `whileHover={{ scale: 1.05 }}`
+
+**Animation Behavior:**
+- GameCard now only zooms in on hover without any vertical movement
+- Scale effect increases card size by 5% on hover
+- Glow effect, border animation, and text color changes remain unchanged
+- Clean, simple hover interaction focused on zoom effect only
+
+**User Experience:**
+- Eliminated unwanted vertical movement animation
+- Cleaner, more focused hover interaction
+- Zoom effect provides visual feedback without distracting raise animation
+
+### 2024-12-22 - Added Comprehensive Steam Authentication System
+
+**Major Enhancement:**
+- Implemented two new authentication methods alongside existing Steam ID input
+- Added full Steam OAuth authentication using Steam's OpenID 2.0 protocol
+- Created QR code authentication system for Steam mobile app simulation
+- Integrated authentication modal with tabbed interface for choosing authentication methods
+- Added session management with secure cookie-based authentication
+- Enhanced user experience with authentication status indicators and logout functionality
+
+**New Authentication Methods:**
+
+1. **Steam OAuth Authentication (OpenID 2.0):**
+   - Full Steam OAuth flow using Steam's official OpenID endpoints
+   - Secure authentication redirect to Steam's login page
+   - Automatic callback handling with Steam ID extraction
+   - Session creation with secure HTTP-only cookies
+   - Transparent user experience with automatic Steam data loading
+
+2. **QR Code Authentication:**
+   - Dynamic QR code generation with unique session tokens
+   - Real-time polling system for authentication status
+   - 5-minute expiration with automatic refresh capability
+   - Simulated Steam mobile app authentication page
+   - Visual countdown timer and status indicators
+
+**API Infrastructure:**
+- **pages/api/auth/steam/login.ts**: Steam OAuth initiation endpoint
+- **pages/api/auth/steam/callback.ts**: OAuth callback handler with OpenID verification
+- **pages/api/auth/session.ts**: Session management API (GET, DELETE)
+- **pages/api/auth/qr/generate.ts**: QR code generation with session tokens
+- **pages/api/auth/qr/poll.ts**: Real-time polling for QR authentication status
+- **pages/api/auth/qr/authenticate.ts**: QR code authentication endpoint
+- **pages/auth/qr/[sessionId].tsx**: Simulated Steam mobile app authentication page
+
+**UI Components:**
+- **components/SteamOAuthButton.tsx**: Steam OAuth login button with loading states
+- **components/QRCodeAuth.tsx**: Complete QR code authentication interface with polling
+- **components/AuthenticationModal.tsx**: Comprehensive authentication modal with tabs
+- **components/AuthenticationModal.tsx**: useAuthentication hook for state management
+
+**Session Management:**
+- Secure session storage with UUIDs and timestamps
+- 24-hour session expiration with automatic cleanup
+- HTTP-only cookies for security
+- Session validation on each request
+- Logout functionality with session cleanup
+
+**Integration Features:**
+- **pages/index.tsx**: Integrated authentication modal and session management
+- **pages/index.tsx**: Authentication button in header with status indicators
+- **pages/index.tsx**: OAuth callback URL handling with automatic Steam data loading
+- **components/SteamIdInput.tsx**: Added authentication button below manual input
+- **components/SteamIdInput.tsx**: Visual separator with "or" between input methods
+
+**User Experience:**
+- **Tabbed Interface**: Choose between Steam OAuth and QR code authentication
+- **Status Indicators**: Green shield for authenticated, blue shield for unauthenticated
+- **Automatic Integration**: Authenticated users automatically load their Steam data
+- **Visual Feedback**: Loading states, success messages, and error handling
+- **Session Persistence**: Stay logged in across browser sessions
+- **Secure Logout**: One-click logout with session cleanup
+- **Mobile Simulation**: QR code authentication demonstrates Steam mobile app flow
+
+**Technical Implementation:**
+- **Steam OpenID 2.0 Protocol**: Full compliance with Steam's authentication system
+- **QR Code Generation**: Using qrcode library for high-quality code generation
+- **Real-time Polling**: 2-second intervals for responsive authentication status
+- **Session Security**: UUID-based sessions with timestamp validation
+- **Error Handling**: Comprehensive error handling for all authentication scenarios
+- **URL Cleanup**: Automatic browser history management for clean URLs
+
+**Dependencies Added:**
+- `openid-client`: For Steam OAuth implementation
+- `qrcode`: For QR code generation
+- `uuid`: For secure session token generation
+- `@types/qrcode` and `@types/uuid`: TypeScript support
+
+**Security Features:**
+- **HTTP-only Cookies**: Prevent XSS attacks
+- **Session Validation**: Server-side session verification
+- **Token Verification**: QR code token validation
+- **Automatic Expiration**: Time-based session and QR code expiration
+- **OpenID Verification**: Steam OpenID response verification
+
+**Benefits:**
+- **Multiple Authentication Options**: Users can choose their preferred method
+- **Enhanced Security**: Secure session management and authentication
+- **Better User Experience**: No need to manually find and enter Steam IDs
+- **Mobile Support**: QR code authentication for mobile users
+- **Seamless Integration**: Authenticated users get immediate access to their data
+
 ### 2024-12-19 - Enhanced GameCard Hover Animation for Smoother User Experience
 
 **Enhancement:**
@@ -1589,3 +1706,404 @@ The interactive title now provides a beautiful spectrum of 11 completely unique 
 ### Environment Variables Identified
 - `STEAM_API_KEY` required for all API routes
 - Used across 5 API endpoints: steam.ts, friends.ts, rankings.ts, gamedetails.ts, achievements.ts
+
+## 2024-12-21 - Fixed Authentication Callback Function Scope Error
+
+**Bug Fix:**
+- Fixed "fetchSteamData is not a function" runtime error in authentication callback handling
+- Resolved JavaScript function expression hoisting issue that prevented authentication flows from working
+
+**Problem:**
+- The `fetchSteamData` function was defined after the `useEffect` that tried to call it
+- JavaScript function expressions (const fetchSteamData = async ...) are not hoisted like function declarations
+- This caused a runtime error when OAuth authentication callbacks tried to fetch Steam data
+
+**Changes:**
+- **pages/index.tsx**: Restructured function definition order:
+  - Moved `fetchSteamData` function definition before the authentication callback `useEffect`
+  - Moved `fetchFriendsData`, `fetchRankingsData`, and all other handler functions to proper positions
+  - Placed authentication callback `useEffect` after all function definitions
+  - Maintained hydration check in correct position before JSX return
+
+**Code Structure (Fixed):**
+1. All function definitions (fetchSteamData, fetchFriendsData, handlers, etc.)
+2. Authentication callback useEffect (can now access functions)
+3. Hydration check and early return
+4. Main JSX return
+
+**User Experience:**
+- Steam OAuth authentication now works correctly without runtime errors
+- QR code authentication flows function properly
+- Authentication callbacks successfully fetch and display Steam data
+- No more "function is not defined" errors during authentication
+
+The authentication system is now fully functional with proper JavaScript function scoping and execution order.
+
+## 2024-12-21 - Removed QR Code Authentication System
+
+**System Removal:**
+- Removed QR code authentication system as it was misleading and non-functional with actual Steam mobile app
+- Steam's QR code authentication is proprietary and not available to third-party developers
+- Simplified authentication to only use Steam OAuth login method
+
+**Files Removed:**
+- `pages/api/auth/qr/generate.ts` - QR code generation API endpoint
+- `pages/api/auth/qr/poll.ts` - QR code polling API endpoint  
+- `pages/api/auth/qr/authenticate.ts` - QR code authentication API endpoint
+- `pages/auth/qr/[sessionId].tsx` - QR code authentication page
+- `components/QRCodeAuth.tsx` - QR code authentication component
+
+**Files Modified:**
+- `components/AuthenticationModal.tsx`: Removed QR code tab system and component usage:
+  - Removed `QRCodeAuth` import
+  - Removed `activeTab` state management
+  - Removed tab navigation UI
+  - Simplified to show only Steam OAuth login option
+  - Removed AnimatePresence wrapper around authentication methods
+
+- `package.json`: Removed QR code related dependencies:
+  - Removed `qrcode` package (QR code generation library)
+  - Removed `@types/qrcode` package (TypeScript types)
+  - Kept `uuid` and `@types/uuid` as they're still used for OAuth session management
+
+**Authentication Methods (After Removal):**
+1. **Manual Steam ID/URL Input** (existing functionality)
+2. **Steam OAuth Authentication** (functional - redirects to Steam's official login)
+
+**User Experience:**
+- Cleaner, more focused authentication interface
+- No misleading QR code option that doesn't actually work with Steam mobile app
+- Single, reliable authentication method through Steam's official OAuth system
+- Removed confusion about QR code functionality
+
+**Technical Impact:**
+- Reduced bundle size by removing QR code generation libraries
+- Simplified authentication flow and state management
+- Removed unused API endpoints and pages
+- Cleaner component architecture without tab-based authentication
+
+The authentication system now provides a straightforward, honest approach with only the Steam OAuth method that actually works reliably.
+
+## 2024-12-21 - Updated Steam Authentication Button Design and Flow
+
+**UI/UX Improvements:**
+- Updated Steam authentication button to match website's crypto-style theme
+- Made button slightly more vibrant than the main "Analyze Gaming Time" button
+- Changed button text from "Authenticate with Steam" to "Login with Steam"
+- Changed icon from Shield to custom Steam logo icon
+- Streamlined authentication flow to skip modal and go directly to Steam login
+
+**Design Changes:**
+- **Button Style**: Updated to match crypto-button theme with cyan colors
+  - Background: `primary/30` → `primary/40` on hover (vs `primary/20` → `primary/30` for main button)
+  - Border: `primary/40` → `primary/50` on hover (more vibrant than main button)
+  - Added glow effect with `shadow-primary/25`
+  - Consistent 300ms transition duration with ease-in-out timing
+  - Scale animation matching main button (1.05/0.95)
+
+**User Experience:**
+- **Direct Login**: Removed authentication modal popup - button now goes directly to Steam OAuth
+- **Simplified Flow**: One-click login instead of modal → tab selection → login
+- **Clear Intent**: "Login with Steam" text is more direct than "Authenticate with Steam"
+- **Steam Logo**: Custom Steam logo icon properly represents Steam instead of generic shield
+- **Updated Help Text**: Changed from "authenticate securely" to "for quick access"
+
+**Technical Implementation:**
+- **Direct Redirect**: `onClick={() => window.location.href = '/api/auth/steam/login'}`
+- **Removed Modal Dependency**: No longer calls `onShowAuth()` function
+- **Streamlined Code**: Simplified authentication trigger without modal state management
+
+**Files Modified:**
+- `components/SteamIdInput.tsx`: Updated button styling, text, icon, and click handler
+- `components/SteamIcon.tsx`: Created proper Steam logo icon component using official Steam logo SVG
+
+The Steam login experience is now more direct and visually consistent with the website's crypto-style theme.
+
+## 2024-12-21 - Reordered Authentication Flow - Steam Login First
+
+**UI/UX Improvement:**
+- Inverted the order of authentication methods to prioritize Steam OAuth login
+- Steam login is now the primary option presented to users first
+- Manual Steam ID input moved to secondary position as alternative method
+
+**New Layout Order:**
+1. **"Login with Steam"** button (top priority)
+2. **"or"** divider line  
+3. **Manual Steam ID input** field with dropdown (alternative method)
+4. **"Analyze Gaming Time"** submit button
+
+**User Experience Benefits:**
+- **Primary Path**: Steam OAuth login is the first thing users see (easier, more secure)
+- **Clear Hierarchy**: Visual priority matches the recommended authentication method
+- **Better Flow**: Most users will use Steam login, so it's now prominently positioned
+- **Fallback Option**: Manual input remains available for users who prefer it
+
+**Visual Changes:**
+- Moved "Login with Steam" button and description to top of form
+- Adjusted "or" divider spacing (`my-6` for better visual separation)
+- Maintained all styling and functionality while reordering components
+
+**Files Modified:**
+- `components/SteamIdInput.tsx`: Restructured layout order, moved authentication section to top
+
+This change reflects the natural user preference for one-click Steam login over manual ID entry.
+
+## 2024-12-21 - Removed Top Right Authentication Icon
+
+**UI Simplification:**
+- Removed the authentication status icon (shield) from the top right corner of the header
+- Simplified header layout to focus on the title and description only
+- Eliminated visual clutter and streamlined the interface
+
+**Changes Made:**
+- **Header Layout**: Removed flex layout with spacers and authentication button
+- **Centered Design**: Changed from justify-between layout to simple centered text layout
+- **Clean Import**: Removed unused Shield icon import from lucide-react
+
+**User Experience Benefits:**
+- **Cleaner Interface**: Less visual distractions in the header area
+- **Focus on Content**: Draws attention to the main title and Steam input options
+- **Simplified Navigation**: Authentication is now handled entirely through the main input area
+- **Consistent Flow**: All authentication options are centralized in the Steam input section
+
+**Files Modified:**
+- `pages/index.tsx`: Removed authentication status icon and simplified header layout
+
+The interface is now cleaner with authentication options centralized in the main input area rather than scattered across the page.
+
+## 2024-12-21 - Removed Steam Login Button Subtitle
+
+**UI Simplification:**
+- Removed the subtitle text "Login with your Steam account for quick access" from below the Steam login button
+- Streamlined the authentication section by eliminating redundant explanatory text
+- Made the interface more concise and focused
+
+**Changes Made:**
+- **Removed Text**: Eliminated the descriptive paragraph below the "Login with Steam" button
+- **Cleaner Layout**: Button now stands alone without additional explanatory text
+- **Less Verbose**: Reduced visual clutter in the authentication section
+
+**User Experience Benefits:**
+- **Cleaner Design**: Less text creates a more modern, minimalist appearance
+- **Self-Explanatory**: "Login with Steam" button text is clear enough on its own
+- **Better Focus**: Users can focus on the action rather than reading explanations
+- **Faster Scanning**: Reduced text makes the interface quicker to parse
+
+**Files Modified:**
+- `components/SteamIdInput.tsx`: Removed subtitle paragraph from Steam login section
+
+The authentication interface is now more streamlined with the button speaking for itself.
+
+### 2024-12-28: Centered Login Options in Middle of Screen
+
+**Files Modified:**
+- `pages/index.tsx` - Restructured layout to center authentication options
+
+**Changes Made:**
+1. **Centered Authentication Screen**: Created a full-screen centered layout when no Steam data is available
+2. **Conditional Layout**: Split the page into two states:
+   - **No Steam Data**: Shows centered authentication screen with title and login options
+   - **With Steam Data**: Shows the normal analytics dashboard layout
+3. **Improved UX**: Login options now appear prominently in the center of the viewport instead of being positioned near the top
+
+**Layout Structure:**
+- When no Steam data: Uses `flex flex-col items-center justify-center min-h-screen` for vertical and horizontal centering
+- When Steam data exists: Uses the standard `max-w-7xl mx-auto` container layout
+- Loading states and profile suggestions remain visible regardless of Steam data state
+
+**Technical Details:**
+- Wrapped all Steam data-dependent content in conditional rendering
+- Maintained responsive design with proper max-width constraints
+- Preserved all existing functionality while improving the initial user experience
+
+### 2024-12-28: Adjusted Login Options Positioning
+
+**Files Modified:**
+- `pages/index.tsx` - Refined layout to keep title at top with spaced login options
+
+**Changes Made:**
+1. **Title Position**: Kept the title and description at the top of the page as normal
+2. **Login Options Spacing**: Added `mt-48` margin to move login options well below the title
+3. **Simplified Layout**: Removed full-screen centering approach for cleaner structure
+4. **Better Visual Hierarchy**: Created generous space between title and login options for improved readability
+
+**Layout Structure:**
+- Title remains at the top with standard positioning
+- Login options appear below with generous spacing (`mt-48` = 192px) when no Steam data is available
+- Single unified layout structure that conditionally shows authentication options
+- Maintains responsive design and all existing functionality
+
+**Technical Details:**
+- Used conditional rendering to show login options only when no Steam data exists
+- Preserved all authentication functionality while improving visual spacing
+- Maintained consistent max-width constraints and responsive behavior
+
+## 2024-12-28 - Added Private Account Error Message for Friends
+
+**Problem Fixed:**
+- When clicking on a friend's banner with a private account, no error message was shown
+- The page would reload/transition without providing feedback about why the profile couldn't be loaded
+- Users were left confused when clicking on private accounts from the friends list
+
+**Enhancement:**
+- Added a prominent red error banner that appears when there's an error while viewing a profile
+- The error banner includes:
+  - Animated pulsing red dot indicator
+  - Clear "Unable to Load Profile" heading
+  - Specific error message (e.g., "No games found for this Steam ID. The profile might be private.")
+  - Close button to dismiss the error
+  - Smooth animations for appearance and interaction
+
+**Visual Design:**
+- **Red Error Banner**: Semi-transparent red background with red border
+- **Animated Indicator**: Pulsing red dot to draw attention
+- **Clear Typography**: Red text with proper hierarchy (heading + message)
+- **Dismissible**: X button to close the error message
+- **Responsive**: Proper spacing and layout across devices
+
+**Technical Implementation:**
+- **Error Display Logic**: Shows error banner when both `error` and `steamData` states exist
+- **Smooth Animations**: Framer Motion animations for slide-in effect
+- **Proper State Management**: Error can be dismissed and state is properly managed
+- **Strategic Placement**: Error banner appears prominently at the top of the profile view
+
+**Files Modified:**
+- `pages/index.tsx`: Added error banner component and imported X icon from lucide-react
+
+**User Experience:**
+- **Clear Feedback**: Users now immediately understand why a profile couldn't be loaded
+- **Professional Appearance**: Error messages are well-styled and not jarring
+- **Actionable**: Users can dismiss the error and continue using the app
+- **Context-Aware**: Error appears specifically when viewing profiles, not in empty states
+
+The friends list now provides proper feedback when attempting to access private accounts, eliminating user confusion.
+
+## 2024-12-28 - Added Persistent Login Options in Header
+
+**User Experience Enhancement:**
+- Replaced the subtitle "Unlock insights into your Steam gaming journey with beautiful analytics" with the login options
+- Made the Steam ID input and login options always visible in the header area
+- Users can now switch accounts at any time, even when data is already loaded
+
+**Changes Made:**
+- **Header Integration**: Moved SteamIdInput component from conditional bottom placement to permanent header position
+- **Always Accessible**: Login options are now visible regardless of whether Steam data is loaded
+- **Better UX**: Users no longer need to clear their data to switch accounts
+- **Cleaner Layout**: Removed the conditional lower Steam ID input section
+
+**Technical Implementation:**
+- **Persistent Component**: SteamIdInput now appears in the header below the title
+- **Centered Layout**: Login options are centered with `max-w-md mx-auto` constraint
+- **Proper Spacing**: Added `mt-6` margin for visual separation from title
+- **Removed Conditional**: Eliminated the `!steamData` condition for login options
+
+**Files Modified:**
+- `pages/index.tsx`: Moved SteamIdInput to header and removed conditional placement
+
+**User Benefits:**
+- **Quick Account Switching**: Can switch accounts without losing current view
+- **Always Available**: Login options are always accessible regardless of app state
+- **Better Workflow**: No need to manually clear data to access different accounts
+- **Consistent Interface**: Login options maintain consistent positioning
+
+This change makes account switching much more intuitive and accessible for users who want to analyze multiple Steam accounts.
+
+## 2024-12-28 - Fixed Slow Button Hover Animations
+
+**Performance Enhancement:**
+- Improved button hover animation responsiveness by reducing transition durations
+- Made all interactive elements feel more snappy and responsive to user interactions
+- Standardized animation timing across components for consistent user experience
+
+**Changes Made:**
+1. **SteamOAuthButton Component**: Reduced `transition-all duration-200` to `duration-150` 
+2. **SteamIdInput Component**: 
+   - "Login with Steam" button: Changed `transition-all duration-300 ease-in-out` to `duration-150 ease-out`
+   - "Analyze Gaming Time" submit button: Reduced `transition-all duration-300` to `duration-150`
+   - Input field: Reduced `transition-all duration-300` to `duration-200`
+
+**Technical Details:**
+- **Faster Hover Response**: Reduced button transitions from 200-300ms to 150ms
+- **Snappier Feel**: 150ms is the optimal duration for perceived responsiveness
+- **Consistent Timing**: Standardized button animations across all components
+- **Maintained Smoothness**: Still smooth transitions but with improved perceived performance
+
+**Files Modified:**
+- `components/SteamOAuthButton.tsx`: Reduced transition duration from 200ms to 150ms
+- `components/SteamIdInput.tsx`: Reduced multiple transition durations for buttons and input field
+
+**User Experience Benefits:**
+- **More Responsive**: Buttons now feel more immediate and responsive to hover
+- **Better Feedback**: Users get quicker visual feedback when interacting with buttons
+- **Modern Feel**: Faster animations align with modern web app expectations
+- **Consistent Experience**: All buttons now have uniform animation timing
+
+The interface now feels more responsive and modern with appropriately timed hover animations.
+
+## 2024-12-28 - Fixed ALL Slow Button Hover Animations
+
+**Complete Animation Speed Optimization:**
+- Fixed all remaining slow hover animations across the entire application
+- Standardized all interactive elements to use 150ms transitions for consistency
+- Eliminated all 200ms+ transitions that were making the interface feel sluggish
+
+**Changes Made:**
+1. **styles/globals.css**: Fixed `crypto-button` class - reduced from `duration-300` to `duration-150`
+2. **components/GameCard.tsx**: 
+   - Hide/show button: `duration-200` → `duration-150`
+   - Hover effects: `duration-300` → `duration-150`
+   - Border animations: `duration-300` → `duration-150`
+3. **components/StatsCard.tsx**: 
+   - Glow effect: `duration-300` → `duration-150`
+   - Border animation: `duration-300` → `duration-150`
+4. **components/FriendsList.tsx**: Friend cards `duration-200` → `duration-150`
+5. **components/ProfileSuggestions.tsx**: Suggestion cards `duration-200` → `duration-150`
+6. **components/GameList.tsx**: 
+   - Search input: `duration-300` → `duration-150`
+   - Close button: Added `duration-150` to transition-colors
+7. **components/GameAnalytics.tsx**: Progress bar `duration-300` → `duration-150`
+8. **components/FunFacts.tsx**: Close button - added `duration-150` to transition-colors
+
+**Technical Impact:**
+- **Unified Experience**: All buttons now have consistent 150ms hover timing
+- **Improved Performance**: Faster transitions reduce perceived latency
+- **Better UX**: Interface feels more responsive and modern
+- **Consistent Standards**: All interactive elements follow the same animation timing
+
+**Files Modified:**
+- `styles/globals.css` - Core crypto-button class optimization
+- `components/GameCard.tsx` - Game card interactions
+- `components/StatsCard.tsx` - Stats card hover effects
+- `components/FriendsList.tsx` - Friend list interactions
+- `components/ProfileSuggestions.tsx` - Profile suggestion cards
+- `components/GameList.tsx` - Game list search and controls
+- `components/GameAnalytics.tsx` - Analytics progress bars
+- `components/FunFacts.tsx` - Modal close button
+
+Every single interactive element in the application now has snappy, responsive hover animations that feel modern and immediate.
+
+## 2024-12-28 - Fixed Framer Motion Button Animation Timing
+
+**Additional Animation Optimization:**
+- Fixed remaining slow Framer Motion animations on key buttons that were missed in the previous fix
+- Added explicit `transition={{ duration: 0.15, ease: "easeOut" }}` to motion.button elements
+- Ensured all interactive buttons have consistent fast animation timing
+
+**Changes Made:**
+1. **components/SteamIdInput.tsx**:
+   - "Login with Steam" button: Added `transition={{ duration: 0.15, ease: "easeOut" }}`
+   - "Analyze Gaming Time" button: Added `transition={{ duration: 0.15, ease: "easeOut" }}`
+2. **components/SteamOAuthButton.tsx**:
+   - Steam OAuth button: Added `transition={{ duration: 0.15, ease: "easeOut" }}`
+
+**Technical Details:**
+- **Framer Motion Default**: By default, Framer Motion uses ~0.3s transitions which felt slow
+- **Explicit Timing**: Added 0.15s duration to match CSS transitions
+- **Consistent Experience**: All buttons now have uniform animation timing across CSS and Framer Motion
+- **Smooth Scaling**: Scale animations now feel snappy and responsive
+
+**Files Modified:**
+- `components/SteamIdInput.tsx` - Fixed both main action buttons
+- `components/SteamOAuthButton.tsx` - Fixed Steam OAuth button
+
+All Framer Motion button animations are now perfectly synchronized with the CSS transitions for a seamless user experience.

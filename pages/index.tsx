@@ -13,10 +13,11 @@ import { Rankings } from '@/components/Rankings'
 import { GameAnalytics } from '@/components/GameAnalytics'
 import { FunFacts } from '@/components/FunFacts'
 import { InteractiveTitle } from '@/components/InteractiveTitle'
+import { AuthenticationModal, useAuthentication } from '@/components/AuthenticationModal'
 
 import { useHiddenGames, calculateVisibleStats } from '@/lib/gameUtils'
 import { recentAccountsStorage } from '@/lib/recentAccounts'
-import { Gamepad2, Clock, Trophy, TrendingUp, List, ArrowLeft } from 'lucide-react'
+import { Gamepad2, Clock, Trophy, TrendingUp, List, ArrowLeft, X } from 'lucide-react'
 
 interface GameData {
   appid: number
@@ -120,31 +121,16 @@ export default function Home() {
   const [rankingsLoading, setRankingsLoading] = useState(false)
   const [rankingsError, setRankingsError] = useState<string | null>(null)
   
+  // Authentication state
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const { authSession, loading: authLoading, checkAuthStatus, logout } = useAuthentication()
+  
   const { hiddenGames, toggleHidden, getHiddenCount, isClient } = useHiddenGames()
 
   // Handle SSR hydration
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <>
-        <Head>
-          <title>HowMuchTime - Steam Gaming Analytics</title>
-          <meta name="description" content="Discover your Steam gaming habits and achievements with crypto-style analytics" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <div className="min-h-screen bg-background">
-          <div className="flex items-center justify-center h-screen">
-            <LoadingSpinner />
-          </div>
-        </div>
-      </>
-    )
-  }
 
   const fetchSteamData = async (id: string, isOriginalSearch: boolean = false) => {
     setLoading(true)
@@ -338,6 +324,47 @@ export default function Home() {
     fetchSteamData(steamId, true) // Treat recent account selection as original search
   }
 
+  // Handle authentication callback URLs
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const authStatus = urlParams.get('auth')
+      const steamid = urlParams.get('steamid')
+      
+      if (authStatus === 'success' && steamid) {
+        // OAuth authentication successful
+        fetchSteamData(steamid, true)
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname)
+      } else if (authStatus === 'error' || authStatus === 'cancelled') {
+        // Show error message
+        const message = urlParams.get('message') || 'Authentication failed'
+        setError(message)
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname)
+      }
+    }
+  }, [mounted])
+
+  // Prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <>
+        <Head>
+          <title>HowMuchTime - Steam Gaming Analytics</title>
+          <meta name="description" content="Discover your Steam gaming habits and achievements with crypto-style analytics" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="min-h-screen bg-background">
+          <div className="flex items-center justify-center h-screen">
+            <LoadingSpinner />
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <Head>
@@ -356,44 +383,70 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="text-center mb-12"
           >
-            <InteractiveTitle className="glow-text" />
-            <p className="text-lg md:text-xl text-muted-foreground">
-              Unlock insights into your Steam gaming journey with beautiful analytics
-            </p>
-          </motion.div>
-
-          {/* Steam ID Input */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-8"
-          >
-            <SteamIdInput
-              onSubmit={(id) => fetchSteamData(id, true)}
-              onSelectRecentAccount={handleSelectRecentAccount}
-              loading={loading}
-              error={profileSuggestions.length > 0 ? null : error}
-            />
-          </motion.div>
-
-          {/* Loading State */}
-          {loading && (
-            <div className="flex justify-center items-center py-20">
-              <LoadingSpinner />
+            <div className="text-center mb-6">
+              <InteractiveTitle className="glow-text" />
             </div>
-          )}
+            <div className="mt-12 mb-8">
+              <SteamIdInput
+                onSubmit={(id) => fetchSteamData(id, true)}
+                onSelectRecentAccount={handleSelectRecentAccount}
+                loading={loading}
+                error={profileSuggestions.length > 0 ? null : error}
+                onShowAuth={() => setShowAuthModal(true)}
+              />
+            </div>
+          </motion.div>
 
-          {/* Profile Suggestions */}
-          {profileSuggestions.length > 0 && (
-            <ProfileSuggestions
-              suggestions={profileSuggestions}
-              onSelectProfile={handleSelectProfile}
-              onClose={() => {
-                setProfileSuggestions([])
-                setError(null)
-              }}
-            />
+
+        </div>
+
+        {/* Loading State and Profile Suggestions - show regardless of steamData */}
+        {loading && (
+          <div className="flex justify-center items-center py-20">
+            <LoadingSpinner />
+          </div>
+        )}
+
+        {/* Profile Suggestions */}
+        {profileSuggestions.length > 0 && (
+          <ProfileSuggestions
+            suggestions={profileSuggestions}
+            onSelectProfile={handleSelectProfile}
+            onClose={() => {
+              setProfileSuggestions([])
+              setError(null)
+            }}
+          />
+        )}
+
+        {/* Content that shows only when Steam data is available */}
+        {steamData && (
+          <div className="max-w-7xl mx-auto">
+
+          {/* Error Banner - Show when there's an error and steam data exists */}
+          {error && steamData && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <div>
+                  <h3 className="text-red-400 font-semibold">Unable to Load Profile</h3>
+                  <p className="text-red-300 text-sm mt-1">{error}</p>
+                </div>
+                <motion.button
+                  onClick={() => setError(null)}
+                  className="ml-auto text-red-400 hover:text-red-300 transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X className="w-5 h-5" />
+                </motion.button>
+              </div>
+            </motion.div>
           )}
 
           {/* Back to Original Profile Button */}
@@ -604,7 +657,18 @@ export default function Home() {
               isVisible={isClient && getHiddenCount() > 0}
             />
           )}
+
+          {/* Authentication Modal */}
+          <AuthenticationModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            onAuthComplete={(steamId) => {
+              fetchSteamData(steamId, true)
+              checkAuthStatus()
+            }}
+          />
         </div>
+        )}
       </div>
     </>
   )

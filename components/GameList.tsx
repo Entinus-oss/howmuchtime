@@ -103,7 +103,7 @@ export function GameList({ games, formatPlaytime, hiddenGames, onToggleHidden, o
             <h2 className="text-2xl font-bold glow-text">All Games Library</h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-muted/20 rounded-lg transition-colors"
+              className="p-2 hover:bg-muted/20 rounded-lg transition-colors duration-150"
             >
               <X className="w-6 h-6" />
             </button>
@@ -122,7 +122,7 @@ export function GameList({ games, formatPlaytime, hiddenGames, onToggleHidden, o
                 className="w-full pl-10 pr-4 py-2 bg-card/50 border border-border/20 rounded-lg
                          text-foreground placeholder-muted-foreground backdrop-blur-sm
                          focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50
-                         transition-all duration-300"
+                         transition-all duration-150"
               />
             </div>
 
@@ -181,8 +181,6 @@ export function GameList({ games, formatPlaytime, hiddenGames, onToggleHidden, o
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(index * 0.02, 0.5) }}
-                  className="will-change-transform"
-                  style={{ transform: 'translate3d(0,0,0)' }}
                 >
                   <GameCard
                     game={game}

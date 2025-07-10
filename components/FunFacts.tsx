@@ -134,7 +134,7 @@ export const FunFacts = memo(function FunFacts({ isOpen, onClose, totalMinutes, 
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-muted/20 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted/20 rounded-lg transition-colors duration-150"
               >
                 <X className="w-5 h-5" />
               </button>

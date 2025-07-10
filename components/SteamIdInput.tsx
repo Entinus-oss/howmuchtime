@@ -2,15 +2,17 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, AlertCircle, Info, Clock, ChevronDown, X, User, Users } from 'lucide-react'
 import { recentAccountsStorage, RecentAccount, EnhancedRecentAccounts, formatPlaytime } from '@/lib/recentAccounts'
+import { SteamIcon } from './SteamIcon'
 
 interface SteamIdInputProps {
   onSubmit: (steamId: string) => void
   onSelectRecentAccount?: (steamId: string) => void
   loading: boolean
   error: string | null
+  onShowAuth?: () => void
 }
 
-export function SteamIdInput({ onSubmit, onSelectRecentAccount, loading, error }: SteamIdInputProps) {
+export function SteamIdInput({ onSubmit, onSelectRecentAccount, loading, error, onShowAuth }: SteamIdInputProps) {
   const [steamId, setSteamId] = useState('')
   const [showHelp, setShowHelp] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
@@ -153,6 +155,28 @@ export function SteamIdInput({ onSubmit, onSelectRecentAccount, loading, error }
   return (
     <div className="max-w-2xl mx-auto" ref={dropdownRef}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Authentication Options */}
+        {onShowAuth && (
+          <div className="text-center">
+            <motion.button
+              onClick={() => window.location.href = '/api/auth/steam/login'}
+              className="w-full bg-primary/30 hover:bg-primary/40 text-primary border border-primary/40 hover:border-primary/50 py-3 px-6 rounded-lg font-semibold transition-all duration-150 ease-out hover:shadow-lg hover:shadow-primary/25 flex items-center justify-center space-x-2"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+            >
+              <SteamIcon className="w-5 h-5" />
+              <span>Login with Steam</span>
+            </motion.button>
+            
+            <div className="flex items-center justify-center space-x-4 my-6">
+              <div className="flex-1 h-px bg-border/20"></div>
+              <span className="text-sm text-muted-foreground">or</span>
+              <div className="flex-1 h-px bg-border/20"></div>
+            </div>
+          </div>
+        )}
+
         <div className="relative">
           <div className="relative">
             <input
@@ -166,7 +190,7 @@ export function SteamIdInput({ onSubmit, onSelectRecentAccount, loading, error }
               className="w-full px-4 py-3 pl-12 pr-16 bg-card/50 border border-border/20 rounded-lg 
                        text-foreground placeholder-muted-foreground backdrop-blur-sm
                        focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50
-                       transition-all duration-300"
+                       transition-all duration-200"
               disabled={loading}
             />
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -263,9 +287,10 @@ export function SteamIdInput({ onSubmit, onSelectRecentAccount, loading, error }
             disabled={loading || !steamId.trim()}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="mt-4 w-full crypto-button px-6 py-3 rounded-lg font-medium
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="mt-4 w-full bg-primary/30 hover:bg-primary/40 text-primary border border-primary/40 hover:border-primary/50 px-6 py-3 rounded-lg font-medium
                      disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-all duration-300"
+                     transition-all duration-150 ease-out hover:shadow-lg hover:shadow-primary/25"
           >
             {loading ? (
               <div className="flex items-center justify-center space-x-2">
@@ -277,6 +302,8 @@ export function SteamIdInput({ onSubmit, onSelectRecentAccount, loading, error }
             )}
           </motion.button>
         </div>
+
+
 
         {/* Help Text */}
         {showHelp && (

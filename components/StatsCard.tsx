@@ -44,10 +44,10 @@ export function StatsCard({ icon, title, value, subtitle, onClick, showIndicator
       </div>
 
       {/* Glow Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none" />
       
       {/* Border Animation */}
-      <div className="absolute inset-0 border border-primary/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div className="absolute inset-0 border border-primary/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none" />
     </motion.div>
   )
 } 

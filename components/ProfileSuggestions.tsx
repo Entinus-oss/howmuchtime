@@ -47,7 +47,7 @@ export function ProfileSuggestions({ suggestions, onSelectProfile, onClose }: Pr
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="flex items-center justify-between p-3 bg-card/30 border border-border/20 rounded-lg hover:bg-card/50 hover:border-primary/30 transition-all duration-200 cursor-pointer group"
+            className="flex items-center justify-between p-3 bg-card/30 border border-border/20 rounded-lg hover:bg-card/50 hover:border-primary/30 transition-all duration-150 cursor-pointer group"
             onClick={() => {
               // Track this as a visited account
               recentAccountsStorage.addVisitedAccount({
